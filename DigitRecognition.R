@@ -1,3 +1,6 @@
+library(tidyverse)
+suppressMessages(library(caret))
+
 
 train <- read.table("C:/Users/ferna/Desktop/Trabajo escolar/1.Universidad/Curso 2025-2026/1_Aprendizaje/Práctica en grupo/train.csv",header=T, sep=",")
 test <- read.table("C:/Users/ferna/Desktop/Trabajo escolar/1.Universidad/Curso 2025-2026/1_Aprendizaje/Práctica en grupo/test.csv",header=T, sep=",")
@@ -8,14 +11,14 @@ table(train$label) ## Número de dígitos que hay de cada tipo
 labels <- train$label
 
 # Función para visualizar un dígito específico
-mostrar_digito <- function(datos, indice_fila) {
+mostrar_digito <- function(datos, indice_fila, nrow = 28, ncol = 28) {
   
   # 1. Extraemos solo los píxeles (quitamos la columna 'label')
   fila_pixeles <- as.numeric(datos[indice_fila, -1]) 
   
   # 2. Reconstruimos la matriz 28x28 usando la lógica de la fórmula x = i*28 + j
   # 'byrow = TRUE' asegura que llenamos la matriz fila a fila, tal como indica la fórmula.
-  matriz_imagen <- matrix(fila_pixeles, nrow = 28, ncol = 28, byrow = TRUE)
+  matriz_imagen <- matrix(fila_pixeles, nrow = nrow, ncol = ncol, byrow = TRUE)
   
   # 3. Visualización
   # La función image() rota la matriz 90 grados, así que corregimos el númro
@@ -25,18 +28,8 @@ mostrar_digito <- function(datos, indice_fila) {
   
   # Mostrar la imagen
   # col = gray.colors(255) usa escala de grises como indica el enunciado (0-255)
-  image(matriz_rotada, col = gray.colors(255, start = 0, end = 1), axes = FALSE, 
-        main = datos[indice_fila, 1])
+  image(matriz_rotada, col = gray.colors(255, start = 0, end = 1), axes = FALSE)
 }
-
-props = colMeans(X > 0)                 # Compute P(X > 0)
-use_pix = props > .15 & props < 1-.15   # Find pixels that are not near-zero-variance
-
-# One-liner:
-use_pix = colMeans(X > 0) |> between(0.15, 1-0.15)
-
-# What is the number of pixels retained?
-sum(use_pix)
 
 # Visualizar el tercer dígito del dataset de entrenamiento (puedes cambiar el índice)
 mostrar_digito(train, 7)
@@ -46,3 +39,51 @@ par(mfrow=c(2,5)) # Dividir ventana en 2x2
 for(k in 1:10) {
   mostrar_digito(train, k)
 }
+
+# Train set
+trainlst = list(
+  n = nrow(train),
+  x = train |> select(-label) |> as.data.frame() |> as.matrix(), 
+  y = train |> pull(label) |> as.factor()
+)
+mostrar_digito(trainlst$x, 7)
+
+# Test set
+testlst = list(
+  n = nrow(test),
+  x = test |> select(-label) |> as.data.frame() |> as.matrix(), 
+  y = test |> pull(label) |> as.factor()
+)
+
+
+# --- PASO 1: Crear la Matriz de Reducción ---
+
+# 1. Matriz W: Promedia pares vecinos (1D)
+# Crea una matriz que transforma vector de 28 a 14 promediando cada 2.
+W <- diag(14)[rep(1:14, each = 2), ] / 2
+
+# 2. Matriz Pool2x2: Expande la transformación a 2D
+# Usa el producto Kronecker para aplicar W tanto a filas como a columnas
+Pool2x2 <- W %x% W 
+
+# Asignar nombres a las nuevas columnas (pixel1...pixel196)
+colnames(Pool2x2) <- paste0("p", 1:ncol(Pool2x2))
+
+
+# --- PASO 2: Aplicar la reducción ---
+
+# Aplicamos la transformación a la matriz de imágenes 'x' que creamos antes
+# Asegúrate de usar la matriz numérica 'trainlst$x', no el dataframe original
+X_reducida <- trainlst$x %*% Pool2x2 
+
+# Verificar la reducción
+dim(X_reducida) 
+# Debería salir: [42000, 196]. ¡Has bajado de 784 a 196 columnas!
+
+## Capturita
+par(mfrow=c(1,2))
+mostrar_digito(trainlst$x, 7)
+mostrar_digito(X_reducida, 7, 14, 14)
+
+
+
