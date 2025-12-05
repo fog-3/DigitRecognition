@@ -2,8 +2,8 @@ library(tidyverse)
 suppressMessages(library(caret))
 
 
-train <- read.table("C:/Users/ferna/Desktop/Trabajo escolar/1.Universidad/Curso 2025-2026/1_Aprendizaje/Práctica en grupo/train.csv",header=T, sep=",")
-test <- read.table("C:/Users/ferna/Desktop/Trabajo escolar/1.Universidad/Curso 2025-2026/1_Aprendizaje/Práctica en grupo/test.csv",header=T, sep=",")
+train <- read.table("C:/Users/TT CUSTOM/Desktop/DigitRecognition/train.csv",header=T, sep=",")
+test <- read.table("C:/Users/TT CUSTOM/Desktop/DigitRecognition/test.csv",header=T, sep=",")
 
 dim(train)
 dim(test)
@@ -49,11 +49,11 @@ trainlst = list(
 mostrar_digito(trainlst$x, 7)
 
 # Test set
-testlst = list(
-  n = nrow(test),
-  x = test |> select(-label) |> as.data.frame() |> as.matrix(), 
-  y = test |> pull(label) |> as.factor()
-)
+#testlst = list(
+ # n = nrow(test),
+  #x = test |> select(-label) |> as.data.frame() |> as.matrix(), 
+  #y = test |> pull(label) |> as.factor()
+#)
 
 
 # --- PASO 1: Crear la Matriz de Reducción ---
@@ -75,6 +75,10 @@ colnames(Pool2x2) <- paste0("p", 1:ncol(Pool2x2))
 # Aplicamos la transformación a la matriz de imágenes 'x' que creamos antes
 # Asegúrate de usar la matriz numérica 'trainlst$x', no el dataframe original
 X_reducida <- trainlst$x %*% Pool2x2 
+X_reducida <- X_reducida /255
+train_reducido_df <- as.data.frame(X_reducida)
+train_reducido_df$label <- trainlst$y
+
 
 # Verificar la reducción
 dim(X_reducida) 
