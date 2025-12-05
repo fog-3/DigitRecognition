@@ -5,7 +5,7 @@ test <- read.table("C:/Users/ferna/Desktop/Trabajo escolar/1.Universidad/Curso 2
 dim(train)
 dim(test)
 table(train$label) ## Número de dígitos que hay de cada tipo
-labels <- 
+labels <- train$label
 
 # Función para visualizar un dígito específico
 mostrar_digito <- function(datos, indice_fila) {
@@ -25,7 +25,7 @@ mostrar_digito <- function(datos, indice_fila) {
   
   # Mostrar la imagen
   # col = gray.colors(255) usa escala de grises como indica el enunciado (0-255)
-  image(matriz_rotada, col = gray.colors(255), axes = FALSE, 
+  image(matriz_rotada, col = gray.colors(255, start = 0, end = 1), axes = FALSE, 
         main = datos[indice_fila, 1])
 }
 
