@@ -2,7 +2,7 @@ library(tidyverse)
 suppressMessages(library(caret))
 
 
-train <- read.table("C:/Users/TT CUSTOM/Desktop/DigitRecognition/train.csv",header=T, sep=",")
+train <- read.table("C:/Users/ferna/Desktop/Trabajo escolar/1.Universidad/Curso 2025-2026/1_Aprendizaje/Práctica en grupo/train.csv",header=T, sep=",")
 test <- read.table("C:/Users/TT CUSTOM/Desktop/DigitRecognition/test.csv",header=T, sep=",")
 
 dim(train)
@@ -36,8 +36,9 @@ mostrar_digito <- function(datos, indice_fila, nrow = 28, ncol = 28, tiene_label
 mostrar_digito(train, 7)
 
 # Visualizar varios para probar (ej. los primeros 4)
-par(mfrow=c(2,5)) # Dividir ventana en 2x2
-for(k in 1:10) {
+par(mar = c(0.1, 0.1, 0.1, 0.1))
+par(mfrow=c(3,10)) # Dividir ventana en 2x2
+for(k in 1:30) {
   mostrar_digito(train, k)
 }
 
@@ -47,7 +48,10 @@ trainlst = list(
   x = train |> select(-label) |> as.data.frame() |> as.matrix(), 
   y = train |> pull(label) |> as.factor()
 )
+<<<<<<< HEAD
 mostrar_digito(trainlst$x, 7, tiene_label = FALSE)
+=======
+>>>>>>> fernando
 
 # Test set
 #testlst = list(
@@ -78,7 +82,12 @@ train_reducido_df$label <- trainlst$y
 # Verificar la reducción
 dim(X_reducida) 
 
+<<<<<<< HEAD
 # Mostramos el digito con la imagen original junto con la convolución realizada
+=======
+## Capturita
+par(mar = c(1, 1, 1, 1))
+>>>>>>> fernando
 par(mfrow=c(1,2))
 mostrar_digito(trainlst$x, 7, tiene_label = FALSE)
 mostrar_digito(X_reducida, 7, nrow = 14, ncol = 14, tiene_label = FALSE)
