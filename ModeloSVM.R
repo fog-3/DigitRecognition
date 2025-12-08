@@ -1,4 +1,3 @@
-
 # --------- Entrenamiento usando un SVM para el problema de DigitRecognition ------------
 
 #Seleccionamos una semilla y cargamos las librerias que vayamos a utilizar
@@ -89,7 +88,7 @@ for(i in 1:length(tamanos_muestra)){
   matrizconfusion <- table(pred, dtest$label)
   accuracy <- sum(diag(matrizconfusion)) / sum(matrizconfusion)
   
-  cat("El accuracy obtenido por el modelo SVM con dataset DigitRecognition es del:", accuracy*100,"%")
+  cat("El accuracy obtenido por el modelo SVM con dataset MNIST es del:", accuracy*100,"%")
   cat("Tiempo empleado en entrenar el modelo:", tiempo_en_segundos ,"s \n")
   
   resultados_curva[nrow(resultados_curva) + 1, ] <- c(

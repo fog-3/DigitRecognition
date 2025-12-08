@@ -1,45 +1,60 @@
 # --------- Entrenamiento usando un Árbol de decisión ------------
+
+
+set.seed(10)
+library(caret)
 library(rpart)
 library(rpart.plot)
+library(ggplot2)
+library(tidyr)
 
+# ---------------------------------------------------------------
 # Usamos 2000 elementos del dataset para entrenar y 300 para test
+# ---------------------------------------------------------------
 x_train <- X_reducida[1:2000, ]
 y_train <- trainlst$y[1:2000]
 
+# --------------------------------------------------
 # Ponemos datos nunca vistos por el modelo para test
+# --------------------------------------------------
 x_test <- X_reducida[2001:2300, ] 
 y_test <- trainlst$y[2001:2300]
 
+# ------------------------
 # Combinar en Data Frames
+# ------------------------
 train_data <- data.frame(y = y_train, x_train)
 test_data <- data.frame(y = y_test, x_test)
 
+# --------------------------------------------
 # Asegurar que la variable objetivo sea Factor
+# --------------------------------------------
 train_data$y <- as.factor(train_data$y)
 test_data$y <- as.factor(test_data$y)
 
-# ENTRENAMIENTO
+# --------------------------------------
+# Realizamos el entrenamiento del modelo
+# --------------------------------------
 decision_tree <- rpart(
   y ~ ., # Predice 'y' basado en todos los demás atributos
   data = train_data,
   method = "class",
-  # Para de iterar cuando la mejoría de cp sea menor o igual al 0.01
-  control = rpart.control(cp = 0.01)
+  control = rpart.control(cp = 0.01) # Para de iterar cuando la mejoría de cp sea menor o igual al 0.01
 )
 
-# EVALUACIÓN
+# -----------------------------------------------------------------
+#Calculamos el accuracy del arbol haciendo uso del conjunto de test
+# -----------------------------------------------------------------
 predictions <- predict(decision_tree, test_data, type = "class")
-
 conf_matrix <- table(Real = test_data$y, Predicho = predictions)
-
 print(conf_matrix)
-
-# Calcular Accuracy
 accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
 
 cat("Precisión del modelo (Accuracy):", round(accuracy * 100, 2), "%\n")
 
-## Dibujo del arbol
+# ---------------
+#Dibujo del arbol
+# ---------------
 mis_colores <- list("pink", "green", "cyan", "yellow", 
                  "orange", "wheat", "lightblue", "lightgray", 
                  "violet", "lightgreen")
