@@ -111,3 +111,9 @@ ggplot(resultados_long, aes(x = tamano_Muestra, y = Valor, color = Parametros)) 
   scale_color_manual(values = c("accuracy" = "blue", "tiempo_Segundos" = "red")) +
   theme_minimal()
 
+
+
+
+
+saveRDS(randomForest, file = "modelo_randomForest_digitrecognition.rds")
+cat("\nModelo guardado correctamente como 'modelo_randomForest_digitrecognition.rd'\n")

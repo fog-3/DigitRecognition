@@ -123,3 +123,13 @@ ggplot(resultados_long, aes(x = tamano_Muestra, y = Valor, color = Parametros)) 
   ) +
   scale_color_manual(values = c("accuracy" = "blue", "tiempo_Segundos" = "red")) +
   theme_minimal()
+
+
+
+
+
+
+#Guardamos el modelo en un fichero
+saveRDS(svmDigit, file = "modelo_svm_digitrecognition.rds")
+cat("\nModelo guardado correctamente como 'modelo_svm_digitrecognition.rds'\n")
+

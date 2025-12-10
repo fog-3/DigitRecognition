@@ -84,3 +84,12 @@ accuracy <- sum(diag(matrizconfusion)) / sum(matrizconfusion)
 cat("El accuracy obtenido por el Stacking con dataset MNIST es del:", accuracy*100,"%")
 cat("Tiempo empleado en entrenar el modelo:", tiempo_en_segundos ,"s \n")
 
+
+
+
+
+#Guardamos el modelo en un fichero
+
+saveRDS(svmFinal, file = "modelo_svmFinal_digitrecognition.rds")
+cat("\nModelo guardado correctamente como 'modelo_svmFinal_digitrecognition.rds'\n")
+

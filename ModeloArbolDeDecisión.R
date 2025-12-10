@@ -69,3 +69,7 @@ rpart.plot(decision_tree,
            main = "Árbol de Decisión: Dígit recognicer",
            box.palette = mis_colores
 )
+
+
+saveRDS(rpart, file = "modelo_rpart_digitrecognition.rds")
+cat("\nModelo guardado correctamente como 'modelo_rpart_digitrecognition.rds'\n")

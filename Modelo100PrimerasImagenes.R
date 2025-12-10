@@ -28,14 +28,24 @@ mejor_gamma <- svm_tune$best.parameters$gamma
 # -------------------------------------------------------------------------------------
 
 tic("--------Entrenamiento del modelo SVM--------")
-svmDigit <- svm(label ~ ., data=dtrain_subsample, kernel = "radial", cost = mejor_costo, gamma = mejor_gamma)
+svmDigit100 <- svm(label ~ ., data=dtrain_subsample, kernel = "radial", cost = mejor_costo, gamma = mejor_gamma)
 tiempo_entrenamiento <- toc()
 tiempo_en_segundos <- tiempo_entrenamiento$toc - tiempo_entrenamiento$tic
 
 #Calculamos el accuracy
-pred <- predict(svmDigit, dtest, type = "class")
+pred <- predict(svmDigit100, dtest, type = "class")
 matrizconfusion <- table(pred, dtest$label)
 accuracy <- sum(diag(matrizconfusion)) / sum(matrizconfusion)
 
+print(matrizconfusion)
+
 cat("El accuracy obtenido por el modelo SVM con 100 muestras utilizando el dataset MNIST es del:", accuracy*100,"%")
 cat("Tiempo empleado en entrenar el modelo:", tiempo_en_segundos ,"s \n")
+
+
+#Guardamos el modelo en un fichero
+saveRDS(svmDigit100, file = "modelo_svm100_digitrecognition.rds")
+cat("\nModelo guardado correctamente como 'modelo_svm_digitrecognition100.rds'\n")
+
+
+
