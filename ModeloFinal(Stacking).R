@@ -37,6 +37,7 @@ dtrain_subsample_model <- train_base[subsample_index, ]
 dtrain_subsample_model <- na.omit(dtrain_subsample_model)
 dtrain_subsample_model$label <- as.factor(dtrain_subsample_model$label)
 
+tic("--------Entrenamiento del modelo Stacking--------")
 svmDigit <- svm(label ~ ., data=dtrain_subsample_model, kernel = "radial", cost = 1, gamma = 0.1)
 svm_predict <-predict(svmDigit,train_meta,type="class")
 
@@ -55,7 +56,8 @@ datasetFinal <- data.frame(
   perceptron_pred = as.factor(perceptron_predict),
   label_real = train_meta$label
 )
-
+tiempo_entrenamiento <- toc()
+tiempo_en_segundos <- tiempo_entrenamiento$toc - tiempo_entrenamiento$tic
 
 # ------------------------------------------------------------------
 #Entreno el modelo final utilizando las predicciones como dataSet
@@ -80,4 +82,5 @@ matrizconfusion <- table(pred, dtest$label)
 accuracy <- sum(diag(matrizconfusion)) / sum(matrizconfusion)
 
 cat("El accuracy obtenido por el Stacking con dataset MNIST es del:", accuracy*100,"%")
+cat("Tiempo empleado en entrenar el modelo:", tiempo_en_segundos ,"s \n")
 
