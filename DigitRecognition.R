@@ -2,7 +2,7 @@ library(tidyverse)
 suppressMessages(library(caret))
 
 
-train <- read.table("C:/Users/ferna/Desktop/Trabajo escolar/1.Universidad/Curso 2025-2026/1_Aprendizaje/Práctica en grupo/train.csv",header=T, sep=",")
+train <- read.table("C:/Users/TT CUSTOM/Desktop/DigitRecognition/train.csv",header=T, sep=",")
 test <- read.table("C:/Users/TT CUSTOM/Desktop/DigitRecognition/test.csv",header=T, sep=",")
 
 dim(train)
@@ -11,25 +11,26 @@ table(train$label) ## Número de dígitos que hay de cada tipo
 labels <- train$label
 
 # Función para visualizar un dígito específico
-mostrar_digito <- function(datos, indice_fila, nrow = 28, ncol = 28) {
+mostrar_digito <- function(datos, indice_fila, nrow = 28, ncol = 28, tiene_label = TRUE) {
   
-  # 1. Extraemos solo los píxeles (quitamos la columna 'label')
-  fila_pixeles <- as.numeric(datos[indice_fila, -1]) 
+  fila <- datos[indice_fila, ]
   
-  # 2. Reconstruimos la matriz 28x28 usando la lógica de la fórmula x = i*28 + j
-  # 'byrow = TRUE' asegura que llenamos la matriz fila a fila, tal como indica la fórmula.
+  if (tiene_label) {
+    # Quitamos la primera columna (label)
+    fila <- fila[-1]
+  }
+  
+  fila_pixeles <- as.numeric(fila)
+  
   matriz_imagen <- matrix(fila_pixeles, nrow = nrow, ncol = ncol, byrow = TRUE)
   
-  # 3. Visualización
-  # La función image() rota la matriz 90 grados, así que corregimos el númro
-  
-  # Rotar la matriz para que se vea bien en el plot
   matriz_rotada <- t(apply(matriz_imagen, 2, rev))
   
-  # Mostrar la imagen
-  # col = gray.colors(255) usa escala de grises como indica el enunciado (0-255)
-  image(matriz_rotada, col = gray.colors(255, start = 0, end = 1), axes = FALSE)
+  image(matriz_rotada,
+        col  = gray.colors(255, start = 0, end = 1),
+        axes = FALSE)
 }
+
 
 # Visualizar el tercer dígito del dataset de entrenamiento (puedes cambiar el índice)
 mostrar_digito(train, 7)
@@ -50,21 +51,16 @@ trainlst = list(
   y = train |> pull(label) |> as.factor()
 )
 
-# --- PASO 1: Crear la Matriz de Reducción ---
+# -------- Convolución de la imagen  -------- #
 
-# 1. Matriz W: Promedia pares vecinos (1D)
 # Crea una matriz que transforma vector de 28 a 14 promediando cada 2.
 W <- diag(14)[rep(1:14, each = 2), ] / 2
 
-# 2. Matriz Pool2x2: Expande la transformación a 2D
 # Usa el producto Kronecker para aplicar W tanto a filas como a columnas
 Pool2x2 <- W %x% W 
 
 # Asignar nombres a las nuevas columnas (pixel1...pixel196)
 colnames(Pool2x2) <- paste0("p", 1:ncol(Pool2x2))
-
-
-# --- PASO 2: Aplicar la reducción ---
 
 # Aplicamos la transformación a la matriz de imágenes 'x' que creamos antes
 X_reducida <- trainlst$x %*% Pool2x2 
@@ -77,11 +73,11 @@ train_reducido_df$label <- trainlst$y
 dim(X_reducida) 
 # Debería salir: [42000, 196]. ¡Ha bajado de 784 a 196 columnas!
 
-## Capturita
+# Mostramos el digito con la imagen original junto con la convolución realizada
 par(mar = c(1, 1, 1, 1))
 par(mfrow=c(1,2))
-mostrar_digito(trainlst$x, 7)
-mostrar_digito(X_reducida, 7, 14, 14)
+mostrar_digito(trainlst$x, 7, tiene_label = FALSE)
+mostrar_digito(X_reducida, 7, nrow = 14, ncol = 14, tiene_label = FALSE)
 
 
 #------- Eliminación de bordes vacíos ---------#
