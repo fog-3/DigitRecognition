@@ -41,20 +41,14 @@ for(k in 1:30) {
   mostrar_digito(train, k)
 }
 
+# ----- Convolución ---------
+
 # Train set
 trainlst = list(
   n = nrow(train),
   x = train |> select(-label) |> as.data.frame() |> as.matrix(), 
   y = train |> pull(label) |> as.factor()
 )
-
-# Test set
-#testlst = list(
- # n = nrow(test),
-  #x = test |> select(-label) |> as.data.frame() |> as.matrix(), 
-  #y = test |> pull(label) |> as.factor()
-#)
-
 
 # --- PASO 1: Crear la Matriz de Reducción ---
 
@@ -73,7 +67,6 @@ colnames(Pool2x2) <- paste0("p", 1:ncol(Pool2x2))
 # --- PASO 2: Aplicar la reducción ---
 
 # Aplicamos la transformación a la matriz de imágenes 'x' que creamos antes
-# Asegúrate de usar la matriz numérica 'trainlst$x', no el dataframe original
 X_reducida <- trainlst$x %*% Pool2x2 
 X_reducida <- X_reducida /255
 train_reducido_df <- as.data.frame(X_reducida)
@@ -82,7 +75,7 @@ train_reducido_df$label <- trainlst$y
 
 # Verificar la reducción
 dim(X_reducida) 
-# Debería salir: [42000, 196]. ¡Has bajado de 784 a 196 columnas!
+# Debería salir: [42000, 196]. ¡Ha bajado de 784 a 196 columnas!
 
 ## Capturita
 par(mar = c(1, 1, 1, 1))
@@ -91,4 +84,21 @@ mostrar_digito(trainlst$x, 7)
 mostrar_digito(X_reducida, 7, 14, 14)
 
 
+#------- Eliminación de bordes vacíos ---------#
 
+library(caret)
+
+# Identificar columnas con varianza cero (o casi cero) de las imagenes originales
+nzv <- nearZeroVar(trainlst$x, saveMetrics = TRUE)
+
+# Identificar columnas con varianza cero (o casi cero) de las imagenes convolucionadas
+nzv2 <- nearZeroVar(X_reducida, saveMetrics = TRUE)
+
+# Vemos cuántos píxeles son "inútiles" (bordes negros constantes)
+print(paste("Píxeles a eliminar (Imagen original):", sum(nzv$zeroVar)))
+
+# Vemos cuántos píxeles son "inútiles" (bordes negros constantes)
+print(paste("Píxeles a eliminar (Imagen convolucionada):", sum(nzv2$zeroVar)))
+
+## Viendo la poca reducción que supone no aplicaremos este método de preprocesamiento
+## No merece la pena
